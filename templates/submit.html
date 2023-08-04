@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Submit</h2>
+<form action="{{url_for('submit', assignment=assignmentdata['id'])}}", method="POST">
+<table>
+    <tr><th>Title</th> <td>{{assignmentdata['title']}}</td></tr>
+    <tr><th>Description</th> <td>{{assignmentdata['description']}}</td></tr>
+    <tr><th>Teacher</th> <td><a href="{{url_for('profile', profile=assignmentdata['teachername'])}}">{{assignmentdata['teachername']}}</a></td></tr>
+    <tr><th>Maximum Score</th><td>{{assignmentdata['maxscore']}}</td></tr>
+    {% if assignmentdata['tableschema'] is defined %}
+    <tr><th>Table Schema</th> <td>{{assignmentdata['tableschema']}}</td></tr>
+    {% endif %}
+    {% if assignmentdata['sampleanswer_allowviewing'] == 1 %}
+        {% if assignmentdata['sampleanswer'] is defined %}
+            <tr><th>Sample Answer</th> <td>{{assignmentdata['sampleanswer']}}</td></tr>
+        {% endif %}
+    {% endif %}
+    <tr><th>Submission</th>
+    <td><textarea name="answer" placehodler="Enter your SQL here" style='width:300px;'></textarea></td>
+    </tr>
+</table>
+<button type="submit">Submit</button>
+</form>
+<script>
+    //courtesy of https://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
+    const textarea = document.getElementsByTagName("textarea");
+    for (let i = 0; i < textarea.length; i++) {
+        textarea[i].setAttribute("style", "height:" + (textarea[i].scrollHeight) + "px;width:300px;overflow-y:hidden;");
+        textarea[i].addEventListener("input", setheight, false);
+    }
+
+    function setheight() {
+        this.style.height = 0;
+        this.style.height = (this.scrollHeight) + "px";
+    }
+</script>
+{% endblock %}

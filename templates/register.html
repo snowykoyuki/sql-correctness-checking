@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register</title>
+  </head>
+  <body>
+    <form action="{{ url_for('register') }}" method="post" style="zoom: 1.75; -moz-transform: scale(1.75); -moz-transform-origin: 0 0">
+      <div class="container" >
+        <h1>Register</h1>
+        {% if error is defined %}
+        <p style="color:red"> {{error}}</p>
+        {% endif %}
+        <hr>
+        <table id="registerform">
+          <tr>
+            <td><label for="username">Username</label></td>
+            <td><input type="text" placeholder="Enter Desired Username" name="username" id="username" required onkeyup="checkusername()"><b id="usernamecheck">{% if usernametaken is defined %} Username is taken {% endif %}</b></td>
+          </tr>
+          
+          <tr>
+            <td><label for="passw">Password</label></td>
+            <td><input type="password" placeholder="Enter Password" name="passw" id="passw" required onkeyup="checkpassword()"></td>
+          </tr>
+        <tr>
+        <td><label for="passw2">Re-enter Password</label></td>
+        <td><input type="password" placeholder="Re-enter Password" name="passw2" id="passw2" required onkeyup="checkpassword()"> <b id="passcheck"></b></td>
+        </tr>
+        </table>
+
+        <hr>
+        <button type="submit" id="btn_register" disabled>Register</button>
+        
+      </div> 
+      <div class="con_login">
+          <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a>.</p>
+      </div>
+    </form> 
+
+    <script>
+      var usernameok = false;
+      var passwordok = false;
+
+      function checkusername(){
+        let usernamecheck = new RegExp('^[a-zA-Z0-9_]{3,16}$')
+        if (document.getElementById('username').value==''){
+            document.getElementById('usernamecheck').innerHTML = '';
+            usernameok=false;
+            document.getElementById('btn_register').disabled = true;
+
+        } else if (usernamecheck.test(document.getElementById('username').value)){
+          document.getElementById('usernamecheck').style.color = 'green';
+          document.getElementById('usernamecheck').innerHTML = 'OK';
+          if (passwordok){
+            document.getElementById('btn_register').disabled = false;
+          }
+          usernameok=true;
+
+        } else {
+          document.getElementById('usernamecheck').style.color = 'red';
+          document.getElementById('usernamecheck').innerHTML = 'Username must be 3-15 characters long with letters, numbers or underscore only';
+          document.getElementById('btn_register').disabled = true;
+          usernameok=false;
+        }
+      }
+    
+      function checkpassword() {
+        let strenthcheck = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})')
+        if (document.getElementById('passw').value == document.getElementById('passw2').value) {
+          if (strenthcheck.test(document.getElementById('passw').value)){
+            document.getElementById('passcheck').style.color = 'green';
+            document.getElementById('passcheck').innerHTML = 'OK';
+            if (usernameok){
+            document.getElementById('btn_register').disabled = false;
+          }
+            passwordok=true;
+          } else {
+            document.getElementById('passcheck').style.color = 'red';
+            document.getElementById('passcheck').innerHTML = 'Password must be of length 8 or longer and have a lowercase leter, a uppercase letter, a number and a special character';
+            document.getElementById('btn_register').disabled = true;
+            passwordok=false;
+          }
+        } else {
+          document.getElementById('passcheck').style.color = 'red';
+          document.getElementById('passcheck').innerHTML = 'Passwords do not match';
+          document.getElementById('btn_register').disabled = true;
+          passwordok=false;
+        }
+      }
+    </script>
+  </body>
+</html>

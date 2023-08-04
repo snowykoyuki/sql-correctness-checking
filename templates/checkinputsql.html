@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <h2>Compare two SQL statements</h2>
+        <form action = "{{ url_for('results') }}" method="POST">
+        <h3>Define tables</h3>
+    	<div class = "tableclass" id='tablediv'>
+            <!--
+            <table class="formtable">
+        	<tr><td>
+            <button class="addbutton" id="addbutton" type="button">Add Column</button></td><td> <button type="button" class='minusbutton' id='minusbutton'>Remove Column</button></td></tr>
+            </table>
+            -->
+            </br>
+        </div>
+            
+            <button type="button" id="btnaddtable" onclick=addtable()>Add Table</button><button type="button" id="btnremtable" style='visibility:hidden'" onclick=removetable()>Remove Table</button> </br>
+            <h3>SQL Statements</h3>
+            <table>
+                <tr>
+                    <td>SQL 1</td>
+                    <td><textarea name="sql1" style='width:300px; height:150px;'></textarea></td>
+                </tr>
+                <tr>
+                    <td>SQL 2</td>
+                    <td><textarea name="sql2" style='width:300px; height:150px;'></textarea></td>
+                </tr>
+                
+                
+                <tr><td><input type="submit" value="Submit"></td></tr>
+            </table>
+            <script>
+                //courtesy of https://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
+                    const textarea = document.getElementsByTagName("textarea");
+                    for (let i = 0; i < textarea.length; i++) {
+                        textarea[i].setAttribute("style", "height:" + (textarea[i].scrollHeight) + "px;overflow-y:hidden;");
+                        textarea[i].addEventListener("input", setheight, false);
+                    }
+
+                    function setheight() {
+                        this.style.height = 0;
+                        this.style.height = (this.scrollHeight) + "px";
+                    }
+
+            		//var colarr = new Array();
+                    //var rownum = 1;
+                    //var attributenum = 0;
+                    var gtablenum = 0;
+                    var tables = [];
+                    //var tableobj = [];
+                    //var attribute = [];
+                    
+                    //runs on fully loading page
+                    window.onload = function(){
+                    	addtable();
+                    };
+                    
+                    //onclick functions for adding tables
+                    function addtable(){
+                    	var newtable = document.createElement('table');
+                        newtable.classList.add('formtable');
+                        
+                        //add row for table name
+                        var topname = newtable.insertRow(0);
+                        var tablenamelabel = topname.insertCell(0);
+                        var tablename = topname.insertCell(1);
+
+                        tablenamelabel.innerHTML = "<label>Table " + (gtablenum+1) +" Name";
+                        tablename.innerHTML = "<input type='text' name='tablename[]'></input>";
+
+                        //pass hidden attribute number value to form
+                        tablename.innerHTML += "<input class='attributecount' type='hidden' name='attributenum[]' value=0></input>";
+
+                        //add row for buttons on top
+                        var topbuttons = newtable.insertRow(1);
+
+                        //add cells for buttons
+                        var addcolumnbutton = topbuttons.insertCell(0);
+                        var remcolumnbutton = topbuttons.insertCell(1);
+
+                        //html for buttons
+                        addcolumnbutton.innerHTML = "<button class='addbutton' type='button'>Add Column in Table " + (gtablenum+1) + "</button>";
+                        remcolumnbutton.innerHTML = "<button type='button' class='minusbutton'>Remove Column</button>";
+                        
+                        var bottomfixedrow1 = newtable.insertRow(2);
+
+                        //add cells for buttons
+                        var bottomcheckbox = bottomfixedrow1.insertCell(0);
+                        bottomcheckbox.colSpan = 2
+                        bottomcheckbox.innerHTML = "<input type='hidden' name='symbolic[]' value='0'><input type='checkbox' onclick='this.previousSibling.value=1-this.previousSibling.value'>Contains extra attributes not used in query</input>";
+
+                        //store rownum and attributenum in array
+                        tables.push({rownum:2, attributenum:0});
+                        
+                        newtable.style="padding-bottom: 25px"
+                        //add table to location
+                        var insertlocation = document.getElementById("tablediv");
+                        insertlocation.appendChild(newtable);
+                        //pass to new variable to avoid unwanted updating
+                        var i = gtablenum;
+                        document.getElementsByClassName("addbutton")[i].onclick=function(){
+                        	addtovalues(i);
+                        };
+                    	document.getElementsByClassName("minusbutton")[i].onclick=function(){
+                    		removefromvalues(i);
+                    	};
+                        //insertlocation.appendChild("<br>");
+                        addtovalues(i);
+                        hideminus(i);
+                        gtablenum++;
+                        if (gtablenum>1)
+                            document.getElementById("btnremtable").style.visibility = 'visible';
+                    }
+                    
+                    function removetable(){
+                        if (gtablenum>0){
+                            document.getElementsByClassName("formtable")[--gtablenum].remove();
+                            tables.pop();
+                            if (gtablenum<=1){
+                                document.getElementById("btnremtable").style.visibility = 'hidden';
+                            }
+                        }
+                    }
+                    
+                    function addtovalues(tablenum){
+                        tables[tablenum].attributenum++;
+						var table = document.getElementsByClassName("formtable")[tablenum];
+                        var namerow = table.insertRow(tables[tablenum].rownum);
+                        var attributenametext = namerow.insertCell(0);
+                        var attributenameselect = namerow.insertCell(1);
+                        
+                        //attributename = request.form.getlist('attributename[]') in backend
+                        attributenametext.innerHTML = "Attribute " + tables[tablenum].attributenum + " name";
+                        attributenameselect.innerHTML = "<input type='text' name='attributename[]' required>";
+						
+                        tables[tablenum].rownum++;
+                        var typerow = table.insertRow(tables[tablenum].rownum);
+                        var attributetypetext = typerow.insertCell(0);
+                        var attributetypeselect = typerow.insertCell(1);
+
+                        tables[tablenum].rownum++;
+                        attributetypetext.innerHTML = "Attribute " + tables[tablenum].attributenum + " type";
+                        attributetypeselect.innerHTML = "<select name='attributetype[]'><option value='char'>Char</option><option value='varchar'>Varchar</option><option value='binary'>Binary</option><option value='varbinary'>Varbinary</option><option value='bit'>Bit</option><option value='bool'>Bool</option><option value='int' selected>Int</option><option value='float'>Float</option><option value='double'>Double</option><option value='decimal'>Decimal</option><option value='date'>Date</option><option value='datetime'>Datetime</option><option value='time'>Time</option><option value='year'>Year</option></select>";
+                        document.getElementsByClassName("attributecount")[tablenum].value++;
+                        showminus(tablenum);
+                    }
+
+                    function removefromvalues(tablenum){
+                        var table = document.getElementsByClassName("formtable")[tablenum];
+                        table.deleteRow(--tables[tablenum].rownum);
+                        table.deleteRow(--tables[tablenum].rownum);
+                        tables[tablenum].attributenum--;
+                        document.getElementsByClassName("attributecount")[tablenum].value--;
+                        hideminus(tablenum);
+                    }
+
+                    function hideminus(tablenum){
+                        if (tables[tablenum].attributenum<=1){
+                            document.getElementsByClassName("minusbutton")[tablenum].style.visibility = 'hidden';
+                        }
+                    }
+
+                    function showminus(tablenum){
+                        if (tables[tablenum].attributenum>1){
+                            document.getElementsByClassName("minusbutton")[tablenum].style.visibility = 'visible';
+                        }
+                    }
+
+                    function onsubmit(){
+                        //var table = document.getElementById("formtable");    
+                        //var namerow = table.insertRow(rownum);
+                        //var attributenametext = namerow.insertCell(0);
+                        //var attributenameselect = namerow.insertCell(1);
+                    }
+                </script>
+        </form>
+        {% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+    <tr><th>Title</th> <td>{{assignmentdata['title']}}</td></tr>
+    <tr><th>Description</th> <td>{{assignmentdata['description']}}</td></tr>
+    <tr><th>Teacher</th> <td><a href="{{url_for('profile', profile=assignmentdata['teachername'])}}">{{assignmentdata['teachername']}}</a></td></tr>
+    <tr><th>Start Date</th> <td>{{assignmentdata['startdate']}}</td></tr>
+    <tr><th>Due Date</th> <td>{{assignmentdata['enddate']}}</td></tr>
+    <tr><th>Maximum Score</th> <td>{{assignmentdata['maxscore']}}</td></tr>
+</table>
+<br>
+{% if submittedlist|length==0 %}
+    <b>No students submitted yet.</b>
+{% else %}
+<table>
+    <tr><th>Student</th><th>Submitted On</th><th>Submission</th><th>Score</th><th>Date Scored</th></tr>
+    {% for submission in submittedlist %}
+    <tr>
+        <td><a href="{{url_for('profile', profile=submission['studentname'])}}">{{submission['studentname']}}</a></td>
+        <td>{{submission['submitdate']}}</td>
+        <td><a href="{{url_for('submission', submission=submission['id'])}}">View</a></td>
+        {% if submission['score'] is none %}
+        <td>Not Graded</td>
+        <td></td>
+        {% else %}
+        <td>{{submission['score']}}/{{assignmentdata['maxscore']}}</td>
+        <td>{{submission['scoredate']}}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

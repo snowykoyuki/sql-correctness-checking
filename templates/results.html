@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <table>
+            <tr>
+                {{result}}
+            </tr>
+            <tr style="color:black;">
+                <td>
+                <h2> Cosette code</h2>
+                <form action="{{url_for('results')}}" method="POST">
+                    <textarea name='cosettecode' onload="setheight">{{cos}}</textarea>
+                    <br>
+                    <button type='submit'>Check Again</button>
+                </form>
+                <script>
+                    const textbox = document.getElementsByTagName("textarea");
+                    for (let i = 0; i < textbox.length; i++) {
+                        textbox[i].setAttribute("style", "height:" + (textbox[i].scrollHeight) + "px;overflow-y:hidden;");
+                        textbox[i].addEventListener("input", setheight, false);
+                    }
+
+                    function setheight() {
+                        this.style.height = 0;
+                        this.style.height = (this.scrollHeight) + "px";
+                    }
+                </script>
+            </td>
+            </tr>
+        </table>
+        {% if error_msg is defined %}
+        <div>            
+            <table>
+                <thead style="color: red;">
+                    <th>Error</th>
+                </thead>
+                <tr style="color: red;">
+                    <td>{{error_msg}}</td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if counterexamples is defined %}
+        <div style="color: blue;">            
+            <table>
+                <thead>
+                    <th>counterexamples</th>
+                </thead>
+                
+                <tr>
+                    <td>{{counterexamples}}</td>
+                </tr>
+                
+            </table>
+        </div>
+        {% endif %}
+        {% if sql1 is defined %}
+            <h2>SQL 1</h2>
+            <p>
+                {{sql1}}
+            </p>
+        </div>
+        {% endif %}
+        {% if sql2 is defined%}
+        <div>
+            <h2>SQL 2</h2>
+            <p>
+                {{sql2}}
+            </p>
+        </div>
+        {% endif %}
+        {% endblock %}

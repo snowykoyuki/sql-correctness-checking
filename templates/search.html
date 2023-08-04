@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<label for="username">Search user:</label><input type="text" onkeyup="changeaction()" id="username" name="username"><br>
+<form id="searchform" name="searchform">
+    <button type="submit">Search</button>
+</form>
+{% if profilenotfound is defined %}
+    Profile not found
+{% endif %}
+
+{% if session['user']['role']==2 %}
+<a href="{{url_for('registerteacher')}}">Create teacher account</a>
+{% endif %}
+    <script>
+    function changeaction(){
+        var profileurl="{{url_for('profile')}}";
+        searchform.action= profileurl + document.getElementById('username').value;
+        //searchform.action="{{url_for('home')}}";
+    }
+    </script>
+{% endblock %}

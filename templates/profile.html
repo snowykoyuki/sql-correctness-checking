@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<b style="font-size: x-large; padding: 0.5em">{{profileinfo['username']}}</b> <i style="font-size:medium; padding: 0.5em; margin-right:0.5em">{{role}}</i> {% if viewself %}<a href = "{{url_for('editprofile')}}">Edit Profile</a>{% endif %}<hr>
+
+{% if followable %}
+{{followstatus}}
+
+    {% if followflag %}
+    <form action="{{url_for('profile', profile=profileinfo['username'])}}">
+        <input type="hidden" name="action" value="unfollow">
+        <button type="submit">Unfollow</button>
+    </form>
+    {% else %}
+    <form action="{{url_for('profile', profile=profileinfo['username'])}}">
+        <input type="hidden" name="action" value="follow">
+        <button type="submit">Follow</button>
+    </form>
+    {% endif %}
+{% endif %}
+
+{% if session['user']['role'] == 2 %}
+    Account created at: {{profileinfo['datecreated']}}<br>
+    Last Logged in at: {{profileinfo['lastlogin']}}<br>
+
+    {% if not viewself %}
+        <form action="{{url_for('profile', profile=profileinfo['username'])}}">
+
+        {% if profileinfo['active']==1 %}
+            <input type="hidden" name="action" value="ban">
+            <button type="submit">Disable Account</button>
+        {% else %}
+            <input type="hidden" name="action" value="unban">
+            <button type="submit">Enable Account</button>
+        {% endif %}
+        </form>
+    {% endif %}
+{% endif %}
+
+{% endblock %}

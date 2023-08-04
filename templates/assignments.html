@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Assignments</h2> {% if session['user']['role']!=0 %} <a href="{{url_for('createassignment')}}">Create New Assignment</a> {% endif %}
+{% if session['user']['role'] == 0 %}
+<table id="assignments">
+    <tr>
+        <th>Title</th>
+        <th>Start Date</th>
+        <th>Due Date</th>
+        <th>Teacher</th>
+        <th>Submission</th>
+    </tr>
+    
+{% for assignment in assignments %}
+<tr>
+    <td><a href="{{ url_for('assignments', assignment=assignment['id']) }}">{{assignment['title']}}</a></td>
+    <td>{{assignment['startdate']}}</td>
+    <td>{{assignment['enddate']}}</td>
+    <td><a href="{{url_for('profile', profile=assignment['teachername'])}}">{{assignment['teachername']}}</a></td>
+    {% if assignment['submitted']==-1 %}
+    <td><a href="{{url_for('submit', assignment=assignment['id'])}}">Submit Now</a></td>
+    {% else %}
+    <td><a href="{{url_for('submission', submission=assignment['submitted'])}}">View</a></td>
+    {% endif %}
+</tr>
+{% endfor %}
+</table>
+
+{% elif session['user']['role'] != 0 %}
+<table id="assignments">
+    <tr>
+        <th>Title</th>
+        <th>Start Date</th>
+        <th>Due Date</th>
+        <th>Students submitted</th>
+    </tr>
+    
+{% for assignment in assignments %}
+<tr>
+    <td><a href="{{ url_for('assignments', assignment=assignment['id']) }}">{{assignment['title']}}</a></td>
+    <td>{{assignment['startdate']}}</td>
+    <td>{{assignment['enddate']}}</td>
+    <td><a href="{{ url_for('submittedlist', assignment=assignment['id']) }}">{{assignment['submitted']}}</a></td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

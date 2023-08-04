@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Assignment</h2>
+<table>
+    <tr><th>Title</th> <td>{{assignmentdata['title']}}</td></tr>
+    <tr><th>Description</th> <td>{{assignmentdata['description']}}</td></tr>
+    <tr><th>Teacher</th> <td><a href="{{url_for('profile', profile=assignmentdata['teachername'])}}">{{assignmentdata['teachername']}}</a></td></tr>
+    <tr><th>Start Date</th> <td>{{assignmentdata['startdate']}}</td></tr>
+    <tr><th>Due Date</th> <td>{{assignmentdata['enddate']}}</td></tr>
+    <tr><th>Maximum Score</th> <td>{{assignmentdata['maxscore']}}</td></tr>
+    {% if assignmentdata['tableschema'] is defined %}
+    <tr><th>Table Schema</th> <td>{{assignmentdata['tableschema']}}</td></tr>
+    {% endif %}
+    {% if assignmentdata['sampleanswer_allowviewing'] == 1 %}
+        {% if assignmentdata['sampleanswer'] is defined %}
+            <tr><th>Sample Answer</th> <td>{{assignmentdata['sampleanswer']}}</td></tr>
+        {% endif %}
+    {% endif %}
+    {% if session['user']['role']==0 %}
+        <tr><th>Submission</th>
+            {% if assignmentdata['submitted'] >=0 %}
+                {% if assignmentexpired %}
+                <td><a href="{{url_for('submission', submission=assignmentdata['submitted'])}}">View</a></td>
+                {% else %}
+                <td><a href="{{url_for('submission', submission=assignmentdata['submitted'])}}">View</a> <a href="{{url_for('submit', assignment=assignmentdata['id'])}}">Submit Again</a></td>
+                {% endif %}
+            {% else %}
+                {% if assignmentexpired %}
+                <td><a href="{{url_for('submit', assignment=assignmentdata['id'])}}">Submit Now (Overdue)</a></td>
+                {% else %}
+                <td><a href="{{url_for('submit', assignment=assignmentdata['id'])}}">Submit Now</a></td>
+                {% endif %}
+            {% endif %}
+        </tr>
+        {% if assignmentdata['score'] is not none %}
+        <tr><th>Score</th>
+            {% if assignmentdata['score'] >=0 %}
+            <td>{{assignmentdata['score']}}/{{assignmentdata['maxscore']}}</td>
+            {% else %}
+            <td>Not marked yet</td>
+            {% endif %}
+        </tr>
+        {% endif %}
+    {% else %}
+    <tr><th>Students Submitted</th><td><a href="{{url_for('submittedlist', assignment=assignmentdata['id'])}}">{{assignmentdata['submitted']}}</a></td></tr>
+    {% endif %}
+</table>
+{% endblock %}

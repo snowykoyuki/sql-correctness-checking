@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Log in</title>
+    </head>
+    <body>
+        <h2>Log In</h2>
+        {% if register is defined %}
+            <div >Registration successful. Login to continue.</div>
+        {% endif %}
+        {% if error is defined %}
+        <p style="color:red"> {{error}}</p>
+        {% endif %}
+        <form action="/login" method="post">
+            <div class="container">
+                <label for="username"><b>Username</b></label> <br>
+                <input type="text" placeholder="Enter Username" name="username" required> 
+            </br>
+                <label for="password"><b>Password</b></label> <br>
+                <input type="password" placeholder="Enter Password" name="passw" required>
+            </div>
+          
+            <div class="container" style="background-color:#f1f1f1">
+            <button type="submit">Login</button>
+            </div>
+            <div class="con_login">
+                <p>Do not have an account yet? <a href="{{ url_for('register') }}">Register now</a>.</p>
+            </div>
+          </form> 
+          
+    </body>
+
+    <style>
+form {
+  border: 3px solid #f1f1f1;
+}
+
+/* Full-width inputs */
+input[type=text], input[type=password] {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+    </style>
+    
+</html>

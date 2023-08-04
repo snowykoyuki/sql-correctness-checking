@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+    <head>
+      {% if title is defined %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title></title>
+      {% endif %}
+    </head>
+    <body>
+        <div>
+            {% if session['user'] is not defined %}
+            <div style="float: right;"></div>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            </div>
+            {% else %}
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('checkinputsql') }}">Check SQL Statements</a>
+            <a href="{{ url_for('assignments')}}">Assignments</a>
+            <a href="{{ url_for('history')}}">History</a>
+            <a href="{{url_for('profile')}}">Users</a>
+
+            <div style="float: right;">
+            <a href="{{ url_for('profile', profile=session['user']['username']) }}">User: {{session['user']['username']}}</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+            {% endif %}
+        </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
+

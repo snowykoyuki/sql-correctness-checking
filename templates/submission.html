@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Submission</h2>
+<table>
+    <tr><th>Assignment Title</th> <td><a href="{{url_for('assignments', assignment=assignmentdata['id'])}}">{{assignmentdata['title']}}</a></td></tr>
+    <tr><th>Assignment Description</th> <td>{{assignmentdata['description']}}</td></tr>
+    <tr><th>Due Date</th> <td>{{assignmentdata['enddate']}}</td></tr>
+    <tr><th>Maximum Score</th> <td>{{assignmentdata['maxscore']}}</td></tr>
+    <tr><th>Submitted by</th> <td><a href="{{url_for('profile', profile=assignmentdata['studentname'])}}">{{assignmentdata['studentname']}}</a></td></tr>
+    <tr><th>Submitted on</th> <td>{{assignmentdata['submitdate']}} {% if assignmentexpired %}(Overdue){% endif %}</td></tr>
+    {% if assignmentdata['tableschema'] is defined %}
+    <tr><th>Table Schema</th> <td>{{assignmentdata['tableschema']}}</td></tr>
+    {% endif %}
+    {% if ((assignmentdata['sampleanswer_allowviewing'] == 1) or (session['user']['role']!=0))%}
+        {% if assignmentdata['sampleanswer'] is defined %}
+            <tr><th>Sample Answer</th> <td>{{assignmentdata['sampleanswer']}}</td></tr>
+        {% endif %}
+    {% endif %}
+    <tr><th>Answer</th><td><textarea readonly onload="setheight">{{assignmentdata['content']}}</textarea>{% if (session['user']['uid']==assignmentdata['teacherid']) or (session['user']['role']==2) or (assignmentdata['sampleanswer_allowviewing'])%} <form action="{{url_for('submission', submission=assignmentdata['submission'])}}" method="POST"><input type='hidden' name="type" value="compare"><button type="submit">Compare answer with sample answer</button></form>{%endif%}</td></tr>
+    
+    {% if compareresult is defined %}
+    <tr><th>Cosette Result</th><td>{{compareresult['result']}}</td></tr>
+        {% if compareresult['code'] == -1 %}
+        <tr><th>Error</th><td>{{compareresult['error']}}</td></tr>
+        <form action="{{url_for('results')}}" method="POST">
+        <tr><th>Cosette code</th><td><textarea name="cosettecode" onload="setheight">{{compareresult['cos']}}</textarea><br><button type="submit">Check again</button></td></tr>
+        </form>
+        {% elif compareresult['code'] == 1 %}
+        <tr><th>Counter Example</th><td>{{compareresult['counterexamples']}}</td></tr>
+        {% endif %}
+    {% endif %}
+
+    {% if assignmentdata['score'] is not none %}
+        <tr><th>Score</th><td>{{assignmentdata['score']}}/{{assignmentdata['maxscore']}}</td></tr>
+        {% if (session['user']['uid'] == assignmentdata['teacherid']) or (session['user']['role']==2) %}
+        <th>Update score</th>
+                <td><form action="{{url_for('submission', submission=assignmentdata['submission'])}}" method="POST"><input type="hidden" name="type" value="score"><input type="number" step="0.1" min=0 max="{{assignmentdata['maxscore']}}" name="score" value="{{assignmentdata['score']}}"><button type="submit">Update</button></form></td>
+        {% endif %}
+        <tr></tr>
+    {% else %}
+        {% if (session['user']['uid']==assignmentdata['teacherid']) or (session['user']['role']==2) %}
+        <tr>
+            <th>Score</th>
+            <td><form action="{{url_for('submission', submission=assignmentdata['submission'])}}" method="POST"><input type="hidden" name="type" value="score"><input type="number" step="0.1" min=0 max="{{assignmentdata['maxscore']}}" name="score" value="0"><button type="submit">Confirm</button></form></td>
+        </tr>
+        {% endif %}
+    {% endif %}
+</table>
+
+<script>
+    const textbox = document.getElementsByTagName("textarea");
+    for (let i = 0; i < textbox.length; i++) {
+        textbox[i].setAttribute("style", "height:" + (textbox[i].scrollHeight) + "px;overflow-y:hidden;");
+        textbox[i].addEventListener("input", setheight, false);
+    }
+
+    function setheight() {
+        this.style.height = 0;
+        this.style.height = (this.scrollHeight) + "px";
+    }
+</script>
+{% endblock %}
